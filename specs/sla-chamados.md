@@ -20,6 +20,8 @@ contando apenas o horário comercial.
 | E | Chamado resolvido | Informa se foi resolvido dentro do prazo ou fora | sua decisão |
 | F | Status `em_andamento` | Existe, e **não pausa** o relógio do SLA | sua decisão |
 | G | Quem pode ser resolvido | **Qualquer** chamado não resolvido, inclusive direto de `aberto` | sua decisão (discordou da proposta) |
+| H | Resolvido sem `resolvidoEm` | A função lança um erro (dado inconsistente) | lacuna achada ao revisar o plano da IA; decisão sua |
+| I | Arredondamento | 2 casas só no objeto devolvido; a classificação usa o valor exato | lacuna achada ao revisar o plano da IA; decisão sua |
 
 > Se mudar uma decisão, atualize esta tabela **antes** de mexer no código.
 
@@ -65,8 +67,9 @@ Regras:
 - R6. Status `resolvido`:
   - `decorrido` menor ou igual ao prazo: `resolvido_no_prazo`
   - `decorrido` maior que o prazo: `resolvido_fora_do_prazo`
+- R6b. Chamado `resolvido` sem `resolvidoEm` é dado inconsistente: a função lança um erro, em vez de assumir uma data.
 - R7. `criadoEm` no futuro: tratado como `decorrido` zero.
-- R8. `restanteHoras = prazoHoras - decorridoHoras`, arredondado em 2 casas. Negativo significa atraso.
+- R8. `restanteHoras = prazoHoras - decorridoHoras`. `decorridoHoras` e `restanteHoras` são arredondados em 2 casas **só no objeto devolvido**; a classificação (R5 e R6) usa o valor exato. Negativo significa atraso.
 
 ## Endpoints
 
@@ -140,6 +143,7 @@ Chamado resolvido (alta, criado segunda 16:00):
 |---|---|---|---|
 | terça 11:00 | 4h | `resolvido_no_prazo` (limite exato) | R6 |
 | terça 11:01 | 4h01 | `resolvido_fora_do_prazo` | R6 |
+| (sem `resolvidoEm`) | n/a | erro: a função lança | R6b |
 
 Criado no futuro: `decorrido` 0 e `no_prazo` (R7).
 
