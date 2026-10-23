@@ -134,3 +134,14 @@ describe("calcularSla: casos adicionais", () => {
     expect(sla.estado).toBe("vencido");
   });
 });
+
+describe("calcularSla: dado inconsistente (R6b)", () => {
+  test("resolvido sem resolvidoEm → lança erro", () => {
+    expect(() =>
+      calcularSla(
+        { prioridade: "alta", status: "resolvido", criadoEm: new Date("2026-03-02T16:00:00-03:00") },
+        new Date("2026-03-03T11:00:00-03:00"),
+      ),
+    ).toThrow(/resolvidoEm/);
+  });
+});
